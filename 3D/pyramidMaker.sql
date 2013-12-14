@@ -1,8 +1,7 @@
--- Function: chp07.pyramid_maker(geometry, numeric, numeric, numeric)
-
--- DROP FUNCTION chp07.pyramid_maker(geometry, numeric, numeric, numeric);
-
-CREATE OR REPLACE FUNCTION chp07.pyramid_maker(origin geometry, basex numeric, basey numeric, height numeric)
+-- Function creates an inverted pyramid
+-- Function takes as input an origin point, the size base in x and y, and the height of the pyramid
+-- Usage example: SELECT 1 pyramid_maker(geom, 2, 2, 1)  AS the_geom;
+CREATE OR REPLACE FUNCTION chp07.pyramidMaker(origin geometry, basex numeric, basey numeric, height numeric)
   RETURNS geometry AS
 $BODY$
 
