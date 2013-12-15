@@ -1,3 +1,4 @@
+-- Function: ST_RotateY(geometry, double precision, geometry)
 CREATE OR REPLACE FUNCTION ST_RotateY(geomA geometry, rotRadians double precision, pointOrigin geometry)
   RETURNS geometry AS
 $BODY$
@@ -8,11 +9,12 @@ WITH transformed AS (
     ),
 ----- Rotate in place
 rotated AS (
-    SELECT ST_RotateY(the_geom, rotRadians) FROM transformed
+    SELECT ST_RotateY(the_geom, rotRadians) AS the_geom FROM transformed
     ),
 ----- Translate back home
 rotTrans AS (
-    SELECT ST_Translate(geomA, ST_X(pointOrigin), ST_Y(pointOrigin), ST_Z(pointOrigin)) AS the_geom
+    SELECT ST_Translate(the_geom, ST_X(pointOrigin), ST_Y(pointOrigin), ST_Z(pointOrigin)) AS the_geom
+	FROM rotated
     )
 ----- profit
 SELECT the_geom from rotTrans
@@ -22,3 +24,4 @@ SELECT the_geom from rotTrans
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100;
+
