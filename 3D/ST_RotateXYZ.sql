@@ -1,5 +1,5 @@
 -- Function: st_rotatezyz(geometry, double precision, double precision, double precision, geometry)
-CREATE OR REPLACE FUNCTION ST_RotateX(geomA geometry, rotRadiansX double precision, rotRadiansY double precision, rotRadiansZ double precision, pointOrigin geometry)
+CREATE OR REPLACE FUNCTION ST_RotateXYZ(geomA geometry, rotRadiansX double precision, rotRadiansY double precision, rotRadiansZ double precision, pointOrigin geometry)
   RETURNS geometry AS
 $BODY$
 
