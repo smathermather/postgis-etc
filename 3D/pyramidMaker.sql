@@ -6,11 +6,33 @@ CREATE OR REPLACE FUNCTION pyramidMaker(origin geometry, basex numeric, basey nu
 $BODY$
 
 -- Create points as the base of the pyramid-- which perversly is in the air... .
-WITH basePoints AS
+WITH basePoints1 AS
 	(
 	SELECT ST_Translate(origin, -0.5 * basex, 0.5 * basey) AS the_geom
 		UNION ALL
 	SELECT ST_Translate(origin, 0.5 * basex, 0.5 * basey) AS the_geom
+		UNION ALL
+	SELECT ST_Translate(origin, 0.5 * basex, -0.5 * basey) AS the_geom
+		UNION ALL
+	SELECT ST_Translate(origin, -0.5 * basex, 0.5 * basey) AS the_geom
+	),
+-- Make the points into a line so we can convert to polygon
+basePointsC1 AS
+	(
+	SELECT ST_MakeLine(the_geom) AS the_geom FROM basePoints1
+	),	
+baseBox1 AS
+	(
+	SELECT ST_MakePolygon(ST_Force3DZ(the_geom)) AS the_geom FROM basePointsC1
+	),
+-- move base of pyramid vertically the input height
+base1 AS
+	(
+	SELECT ST_Translate(the_geom, 0, 0, height) AS the_geom FROM baseBox1
+	),
+basePoints2 AS
+	(
+	SELECT ST_Translate(origin, -0.5 * basex, 0.5 * basey) AS the_geom
 		UNION ALL
 	SELECT ST_Translate(origin, 0.5 * basex, -0.5 * basey) AS the_geom
 		UNION ALL
@@ -19,18 +41,18 @@ WITH basePoints AS
 	SELECT ST_Translate(origin, -0.5 * basex, 0.5 * basey) AS the_geom
 	),
 -- Make the points into a line so we can convert to polygon
-basePointsC AS
+basePointsC2 AS
 	(
-	SELECT ST_MakeLine(the_geom) AS the_geom FROM basePoints
+	SELECT ST_MakeLine(the_geom) AS the_geom FROM basePoints2
 	),	
-baseBox AS
+baseBox2 AS
 	(
-	SELECT ST_MakePolygon(ST_Force3DZ(the_geom)) AS the_geom FROM basePointsC
+	SELECT ST_MakePolygon(ST_Force3DZ(the_geom)) AS the_geom FROM basePointsC2
 	),
 -- move base of pyramid vertically the input height
-base AS
+base2 AS
 	(
-	SELECT ST_Translate(the_geom, 0, 0, height) AS the_geom FROM baseBox
+	SELECT ST_Translate(the_geom, 0, 0, height) AS the_geom FROM baseBox2
 	),
 -- Now we construct the triangles, ensuring that we digitize them counterclockwise for validity
 triOnePoints AS
@@ -100,7 +122,9 @@ pyramid AS
 		UNION ALL
 	SELECT the_geom FROM triFourAngle
 		UNION ALL
-	SELECT the_geom FROM base
+	SELECT the_geom FROM base1
+		UNION ALL
+	SELECT the_geom FROM base2
 	),
 -- format the pyramid temporarily as a 3D multipolygon
 pyramidMulti AS
@@ -115,15 +139,21 @@ textPyramid AS
 	),
 textBuildSurface AS
 	(
-	SELECT ST_GeomFromText(replace(textpyramid, 'MULTIPOLYGON', 'POLYHEDRALSURFACE')) AS the_geom FROM textPyramid
+	SELECT ST_GeomFromText(replace(textpyramid, 'MULTIPOLYGON', 'TIN')) AS the_geom FROM textPyramid
+	),
+-- Perform a self intersection in order to return as a TIN
+tinSurface AS
+	(
+	SELECT ST_3DIntersection(the_geom, the_geom) AS the_geom FROM textBuildSurface
 	)
 
-SELECT the_geom FROM textBuildSurface
+SELECT the_geom FROM tinSurface
 
 ;
 
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION pyramid_maker(geometry, numeric, numeric, numeric)
+ALTER FUNCTION pyramidMaker(geometry, numeric, numeric, numeric)
   OWNER TO me;
+
