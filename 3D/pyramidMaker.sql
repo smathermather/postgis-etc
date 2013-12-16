@@ -139,15 +139,10 @@ textPyramid AS
 	),
 textBuildSurface AS
 	(
-	SELECT ST_GeomFromText(replace(textpyramid, 'MULTIPOLYGON', 'TIN')) AS the_geom FROM textPyramid
-	),
--- Perform a self intersection in order to return as a TIN
-tinSurface AS
-	(
-	SELECT ST_3DIntersection(the_geom, the_geom) AS the_geom FROM textBuildSurface
+	SELECT ST_GeomFromText(replace(textpyramid, 'MULTIPOLYGON', 'POLYHEDRALSURFACE')) AS the_geom FROM textPyramid
 	)
 
-SELECT the_geom FROM tinSurface
+SELECT the_geom FROM textBuildSurface
 
 ;
 
@@ -156,4 +151,3 @@ $BODY$
   COST 100;
 ALTER FUNCTION pyramidMaker(geometry, numeric, numeric, numeric)
   OWNER TO me;
-
