@@ -18,7 +18,7 @@
 -- to this:
 -- TIN ( ((-1.14864 0.61002 -2.00108,-0.433998 -0.0288903 -2.13766, ...
 
-CREATE OR REPLACE FUNCTION chp07.AsTIN(geometry)
+CREATE OR REPLACE FUNCTION AsTIN(geometry)
   RETURNS geometry AS
 $BODY$
 
@@ -50,5 +50,3 @@ SELECT the_geom FROM tingeom
 $BODY$
   LANGUAGE sql VOLATILE
   COST 100;
-ALTER FUNCTION chp07.AsTIN(geometry)
-  OWNER TO postgres;
