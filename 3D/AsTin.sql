@@ -13,6 +13,11 @@
 -- Once that we have this geometry in text form, the easiest way to fix this is
 -- with string replacement to fix these two things, then convert back to binary
 
+-- We'll go from e.g. this:
+-- GEOMETRYCOLLECTION Z (POLYGON Z ((-1.14864 0.61002 -2.00108,-0.433998 -0.0288903 -2.13766, ...
+-- to this:
+-- TIN ( ((-1.14864 0.61002 -2.00108,-0.433998 -0.0288903 -2.13766, ...
+
 CREATE OR REPLACE FUNCTION chp07.AsTIN(geometry)
   RETURNS geometry AS
 $BODY$
