@@ -2,6 +2,12 @@
 -- Uses the hackerish approach of converting to text, and doing string replacement
 --- for format conversion.
 
+-- Thus there are two ways in which this is not a TIN-- the internal POLYGON Z are
+-- implicitly triangles, but explicitly POLYGON Zs.  In addition, the external wrapper
+--for the collection of triangles is a GEOMETRYCOLLECTION, but a TIN.
+-- Once that we have this geometry in text form, the easiest way to fix this is
+-- with string replacement.
+
 CREATE OR REPLACE FUNCTION chp07.AsTIN(geometry)
   RETURNS geometry AS
 $BODY$
