@@ -36,7 +36,7 @@ SELECT replace(atext, 'POLYGON Z', '') as ttext
 replacegc AS
 (
 -- change leading declaration to TIN
-SELECT replace(ttext, 'GEOMETRYCOLLECTION Z', 'TIN') AS tintext
+SELECT replace(ttext, 'GEOMETRYCOLLECTION Z', 'TIN Z') AS tintext
   from replacedt
 ),
 tingeom AS
